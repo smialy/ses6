@@ -1,0 +1,44 @@
+{
+  "name": "senv",
+  "version": "1.0.0",
+  "description": "sosgi env",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test",
+    "cover": "make cover",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "test": "{libs,tests}/*.js"
+  },
+  "bin": {
+    "senv": "./index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.7.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.4.5",
+    "babel-plugin-transform-es2015-modules-systemjs": "^6.9.0",
+    "babel-plugin-transform-es2015-parameters": "^6.4.5",
+    "babel-register": "^6.4.3",
+    "chalk": "^1.1.1",
+    "chokidar": "^1.4.3",
+    "co": "^4.6.0",
+    "commander": "^2.9.0",
+    "koa": "^1.1.2",
+    "koa-router": "^5.4.0",
+    "koa-send": "^3.1.0",
+    "mime-types": "^2.1.10",
+    "mz": "^2.3.1",
+    "npm": "^3.7.1",
+    "rimraf": "^2.5.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.5.1",
+    "chai": "^3.5.0",
+    "isparta": "^4.0.0",
+    "mocha": "^2.4.5",
+    "npm-watch": "^0.1.1"
+  }
+}
