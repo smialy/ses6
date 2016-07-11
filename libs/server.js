@@ -3,6 +3,7 @@ import fs from 'mz/fs';
 import path from 'path';
 import mime from 'mime-types';
 import chokidar from 'chokidar';
+import {rollup} from 'rollup';
 
 import koa from 'koa';
 import Router from 'koa-router';
@@ -13,23 +14,28 @@ import {
 } from './consts';
 import * as utils from './utils';
 import MemoryCache from './core/cache/memory';
-import transformFile from './core/loader/main';
+import transformFile from './core/loaders/main';
+import rollupPlugin from './core/rollup/main';
 
 const STATIC_ROOT = `${ROOT}/_dev`;
 
-
 export default function server(root, port = 8000) {
+    console.log(root)
     let app = koa();
-    // let dev = new Router({
-    //     //prefix:'/_dev'
-    // });
+    let dev = new Router({
+        prefix:'/_dev'
+    });
     // dev.get('/', function *(next){
     //     yield send(this, 'index.html', {root: root});
     // });
-    // // app.get('/bundles/:path+',function *(){
-    // //     console.log(this.params.path);
-    // //     yield send(this, this.params.path, { root: root});
-    // // });
+    dev.get('/bundles/:path+', function*(next){
+        console.log('aaa', this.params.path);
+        this.body = yield rollupPlugin(root, this.params.path);
+
+        // yield rollupPlugin(root, this.params.path);
+
+        // yield send(this, this.params.path, {root: root});
+    });
     // dev.get('/:path+',function *(){
     //     yield send(this, this.params.path, { root: root});
     // });
@@ -37,6 +43,17 @@ export default function server(root, port = 8000) {
     app.on('error', function(err, ctx) {
         log.error('server error', err, ctx);
     });
+    app.use(function *(next) {
+          try {
+            yield next;
+          } catch (err) {
+            this.status = err.status || 500;
+            // this.body = err.message;
+            this.body = err.stack;
+            // this.app.emit('error', err, this);
+
+          }
+        });
 
     function stat(file) {
         return function(done) {
@@ -49,14 +66,15 @@ export default function server(root, port = 8000) {
     var watcher = chokidar.watch(path.join(root, 'src'), {
       ignored: /[\/\\]\./, persistent: true
     });
+    watcher.add(path.join(root, 'test'));
     watcher.add(path.join(root, 'index.html'));
     watcher.add(path.join(root, 'jspm.config.js'));
     watcher.on('change', function(path, stats) {
         cache.remove(path);
     });
 
+    app.use(responseTime);
     app.use(sendMiddleware(root, cache));
-    // app.use(responseTime);
     // app.use(function *(next) {
     //     if(this.path === '/'){
     //         this.redirect('/_dev');
@@ -66,7 +84,7 @@ export default function server(root, port = 8000) {
     //     }
     // });
 
-    // app.use(dev.routes(), dev.allowedMethods());
+    app.use(dev.routes(), dev.allowedMethods());
     app.listen(8000);
 }
 
@@ -111,7 +129,7 @@ function sendMiddleware(root, cache) {
                     try{
                         body = yield transformFile(filePath);
                     }catch(e){
-                        console.log(e, e.stack)
+                        console.log(e)
                     }
                 }
                 cache.set(filePath, body);
