@@ -1,40 +1,22 @@
 import path from 'path';
 import fs from 'mz/fs';
 import {rollup} from 'rollup';
+import co from 'co';
 
 
-export default function(root, name) {
-    let bundlePath = path.resolve(path.join(root, 'bundles', name));
-    let packagePath = path.join(bundlePath, 'package.json');
+
+export default function(resolver, name) {
     return function *(){
-        if(!(yield fs.exists(bundlePath))){
-            throw new TypeError('Not found bundle path: '+bundlePath);
-        }
-        if(!(yield fs.exists(packagePath))){
-            throw new TypeError('Not found bundle package file: package.json');
-        }
-
-        let data = JSON.parse(yield fs.readFile(packagePath, 'utf-8'));
-        if(!data.hasOwnProperty('main')){
-            throw new TypeError('Not found "main" entry in package.json file');
-        }
-        let mainFilePath = path.join(bundlePath, data.main);
-        if(!(yield fs.exists(mainFilePath))){
-            throw new TypeError('Not found "main" entry: '+mainFilePath);
-        }
-        let bundle = yield rollup({
-            entry: mainFilePath
+        let bundleRollup = yield rollup({
+            entry: name,
+            plugins: [
+                resolver.id(),
+                resolver.memory()
+            ]
         });
-        return bundle.generate({
-            moduleName: name
+        return bundleRollup.generate({
+            moduleName: name,
+            format: 'iife'
         }).code;
     };
-}
-
-function rollupPlugin(options = {}) {
-    return {
-        transform(code, id){
-            console.log(id);
-        }
-    }
 }
