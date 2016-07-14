@@ -1,20 +1,21 @@
-import fs from 'fs';
+import fs from 'mz/fs';
+import co from 'co';
+import path from 'path';
 import * as ui from './ui';
-import server from './server';
-import {ROOT_SOSGI} from './consts';
+import server from './core/server';
+import {SOSGI_DIR} from './consts';
 
 
 let api = {
-    init: () => {
-        fs.stat(ROOT_SOSGI, err => {
-            if(err){
-                fs.mkdir(ROOT_SOSGI, err => ui.error(`Not create folder ${err}`));
+    init: (config) => {
+        let root = path.join(config.root, SOSGI_DIR);
+        co(async function(){
+            if(await fs.exists(root) == false){
+                await fs.mkdir(root);
             }
         });
     },
-    server: (root) => {
-        server(root);
-    },
-    install: () => {}
+    server: config => server(config),
+    install: config => console.log('install', config.locations)
 };
 export default api;

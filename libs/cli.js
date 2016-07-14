@@ -30,18 +30,29 @@ commander.on('--help', function() {
     `);
 });
 
-commander.command('init')
+commander.command('init [dir]')
     .description('init workspace')
-    .action(() => {
+    .action(dir => {
         ui.log(consts.PREFIX_MSG + 'Init workspace');
-        api.init();
+        api.init({
+            root: getRoot(dir)
+        });
     });
 
 commander.command('server [dir]')
     .description('start development server')
-    .action((dir) => {
-        ui.log(consts.PREFIX_MSG + 'Start dev server');
-        api.server(dir && path.resolve(dir) || process.cwd());
+    .option('-h --host <host>', 'server host')
+    .option('-p --port <port>', 'server port')
+    .action((dir, options) => {
+        let port = options.port || 8000;
+        let host = options.host || 'localhost';
+        let root = getRoot(dir);
+        ui.log(consts.PREFIX_MSG + `Start dev server: http://${host}:${port}/`);
+        api.server({
+            root,
+            host,
+            port
+        });
     });
 
 
@@ -49,7 +60,9 @@ commander.command('install [location...]')
     .description('install bundles')
     .action((locations) => {
         ui.log(consts.PREFIX_MSG + 'install bundles');
-        api.install(locations);
+        api.install({
+            locations
+        });
     });
 
 commander.command('*')
@@ -58,3 +71,8 @@ commander.command('*')
         commander.outputHelp();
         process.exit(consts.ERROR_EXIT);
     });
+
+
+function getRoot(dir=''){
+    return dir && path.resolve(dir) || process.cwd()
+}

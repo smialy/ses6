@@ -1,8 +1,4 @@
-import path from 'path';
-import fs from 'mz/fs';
 import {rollup} from 'rollup';
-import co from 'co';
-
 
 
 export default function(resolver, name) {
@@ -10,8 +6,7 @@ export default function(resolver, name) {
         let bundleRollup = yield rollup({
             entry: name,
             plugins: [
-                resolver.id(),
-                resolver.memory()
+                resolver.id()
             ]
         });
         return bundleRollup.generate({

@@ -8,7 +8,7 @@ export default class VFS{
      * @param {...String} paths
      */
     constructor(root, ...paths){
-        this.root = npath.join(root, ...paths);
+        this.root = path.join(root, ...paths);
     }
     read(path, encoding='utf8', flag='r'){
         return fs.readFile(this.join(path), {encoding: encoding, flag: flag});
