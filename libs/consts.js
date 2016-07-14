@@ -13,6 +13,7 @@ if (process.env.SOSGI_HOME){
 
 const NAME = 'sOSGi';
 export const SOSGI_DIR = '.sosgi';
+export const BUNDLES_DIR = 'bundles';
 
 export const PREFIX_MSG = chalk.green(`[${NAME}] `);
 export const PREFIX_MSG_ERR = chalk.red(`[${NAME}][ERROR] `);

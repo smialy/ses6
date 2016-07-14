@@ -3,7 +3,9 @@ import co from 'co';
 import fs from 'mz/fs';
 import Router from 'koa-router';
 import send from 'koa-send';
+import {BUNDLES_DIR} from '../../consts';
 import MemoryCache from '../cache/memory';
+
 import rollupPlugin from './rollup';
 
 export default function devMiddleware(root){
@@ -32,7 +34,7 @@ export default function devMiddleware(root){
         try{
             let body = cache.get(path);
             if(!body){
-                body = yield rollupPlugin(resolver, this.params.path);
+                body = yield rollupPlugin(resolver, path);
                 cache.set(path, body);
             }
             this.body = body;
@@ -47,7 +49,6 @@ export default function devMiddleware(root){
 class ModuleResolver{
     constructor(modules){
         this.modules = modules;
-        this.cache = new Map();
     }
     id(){
         let modules = this.modules;
@@ -78,30 +79,12 @@ class ModuleResolver{
             }
         };
     }
-    memory(){
-        let cache = this.cache;
-        return {
-            load(id){
-                return co(function*(){
-                    if(!cache.has(id)){
-                        console.log('load from disc');
-                        let body = yield fs.readFile(id, 'utf-8');
-                        cache.set(id, {
-                            code: body,
-                            map: null
-                        });
-                    }
-                    return cache.get(id);
-                });
-            }
-        }
-    }
 }
 
 
 class Modules{
     constructor(root){
-        this.root = path.join(root, 'bundles');
+        this.root = path.join(root, BUNDLES_DIR);
         this.modules = new Map();
     }
     * getModule(name){
