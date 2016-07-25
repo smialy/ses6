@@ -1,16 +1,28 @@
 import path from 'path';
-import sqlite3 from 'sqlite3';
+import co from 'co';
+import VFS from '../vfs';
+import {SOSGI_DIR} from '../consts';
 
-NAME = 'db.sqlite3'
+
+class Bundles{
+    constructor(vfs){
+
+    }
+}
 
 export default class Storage{
     constructor(root){
-        this.db = new sqlite3.Database(path.join(root, NAME));
+        this.vfs = new VFS(path.join(root, SOSGI_DIR));
     }
     create(){
-        this.db.serialize(() => {
-            this.db.run("CREATE TABLE bundles (id PRIMARY KEY, endpoint TEXT, name TEXT, path TEXT, version TEXT)");
-        });
+        let vfs = this.vfs;
+        co(function*(){
+            if(!(yield vfs.exists())){
+                yield vfs.mkdir()
+                yield vfs.write('bundles.json', '[]');
+                yield vfs.write('info.json', '{}');
+            }
+        }).catch(e => console.log(e));
     }
     load(){
         return new Promise((resolve, reject) => {
@@ -28,6 +40,6 @@ export default class Storage{
         for (var i = 0; i < 10; i++) {
             stmt.run(endpoint, name, path, version);
         }
-        stmt.finalize(;
+        stmt.finalize();
     }
 }

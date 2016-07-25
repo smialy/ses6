@@ -8,7 +8,7 @@ import {SOSGI_DIR} from './consts';
 
 
 let api = {
-    init: workspace => workspace.create();
+    init: workspace => workspace.create(),
     server: workspace => server(workspace.config),
     install: workspace => install(workspace)
 };

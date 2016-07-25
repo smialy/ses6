@@ -7,6 +7,7 @@ import * as middlewares from './middlewares'
 
 
 export default function server(config) {
+    console.log(config)
     let root = config.root;
     let app = koa();
 

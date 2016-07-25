@@ -49,7 +49,7 @@ commander.command('server [dir]')
         api.server(getWorkspace(dir, {
             host,
             port
-        });
+        }));
     });
 
 
@@ -59,7 +59,7 @@ commander.command('install [location...]')
         ui.log(consts.PREFIX_MSG + 'install bundles');
         api.install(getWorkspace(dir, {
             location
-        });
+        }));
     });
 
 commander.command('*')
@@ -74,10 +74,7 @@ function getRoot(dir=''){
     return dir && path.resolve(dir) || process.cwd()
 }
 
-function getWorkspace(dir, config={}, load=true){
-    let workspace = new Workspace(getRoot(dir), config);
-    if(load){
-        workspace.load();
-    }
-    return workspace;
+function getWorkspace(dir, config={}){
+    config.root = getRoot(dir);
+    return new Workspace(config);
 }

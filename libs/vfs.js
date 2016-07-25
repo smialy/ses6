@@ -1,4 +1,4 @@
-import npath from 'path';
+import $path from 'path';
 import fs from 'mz/fs';
 import rimraf from 'rimraf';
 
@@ -8,7 +8,7 @@ export default class VFS{
      * @param {...String} paths
      */
     constructor(root, ...paths){
-        this.root = path.join(root, ...paths);
+        this.root = $path.join(root, ...paths);
     }
     read(path, encoding='utf8', flag='r'){
         return fs.readFile(this.join(path), {encoding: encoding, flag: flag});
@@ -20,7 +20,7 @@ export default class VFS{
      * @param {String} _path
      */
     join(path=''){
-        return npath.join(this.root, path);
+        return $path.join(this.root, path);
     }
     exists(path=''){
         return fs.stat(this.join(path)).then(() => true, ()=> false);
