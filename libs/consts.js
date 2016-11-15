@@ -3,7 +3,7 @@ import chalk from 'chalk';
 
 
 export const ROOT = path.dirname(__dirname);
-
+export const RESOURCES_ROOT = path.join(ROOT, 'libs', '_res');
 
 let SOSGI_ROOT_PATH = '';
 if (process.env.SOSGI_HOME){
@@ -13,7 +13,9 @@ if (process.env.SOSGI_HOME){
 
 const NAME = 'sOSGi';
 export const SOSGI_DIR = '.sosgi';
-export const BUNDLES_DIR = 'bundles';
+export const BUNDLES_DIR = 'node_modules';
+export const PACKAGE_FILE = 'package.json';
+
 
 export const PREFIX_MSG = chalk.green(`[${NAME}] `);
 export const PREFIX_MSG_ERR = chalk.red(`[${NAME}][ERROR] `);

@@ -1,14 +1,14 @@
 import git from 'nodegit';
+import Endpoint from './base';
 
-export default class GitEndpoint{
-    constructor(location, config={}){
-        this.location = location;
-        this.config = config;
-    }
+
+export default class GitEndpoint extends Endpoint{
+
+
     download(dest){
         return git.Clone(this.getUrl(), dest, getCloneOptions()).then(repo => {
             return repo.checkoutBranch(this.location.version);
-        }).catch(e => console.log(e));
+        });
     }
     getUrl(){
         return this.location.path;

@@ -6,7 +6,6 @@ import * as consts from './consts';
 import pkg from '../package.json';
 import api from './api';
 import {setupExceptionHandler} from './utils';
-import Workspace from './workspace';
 
 export default function run(argv){
     setupExceptionHandler();
@@ -34,7 +33,9 @@ commander.command('init [dir]')
     .description('init workspace')
     .action(dir => {
         ui.log(consts.PREFIX_MSG + 'Init workspace');
-        api.init(getWorkspace(dir, {}, true));
+        api.init({
+            dir
+        });
     });
 
 commander.command('server [dir]')
@@ -46,20 +47,23 @@ commander.command('server [dir]')
         let host = options.host || 'localhost';
 
         ui.log(consts.PREFIX_MSG + `Start dev server: http://${host}:${port}/`);
-        api.server(getWorkspace(dir, {
+        api.server({
+            dir,
             host,
             port
-        }));
+        });
     });
 
 
 commander.command('install [location...]')
     .description('install bundles')
-    .action((locations) => {
+    .option('-e --edit', 'edit, git protocol')
+    .action((locations, options) => {
         ui.log(consts.PREFIX_MSG + 'install bundles');
-        api.install(getWorkspace(dir, {
-            location
-        }));
+        api.install({
+            edit: !!options.edit,
+            locations
+        }).catch(err => ui.error(err));
     });
 
 commander.command('*')
@@ -68,13 +72,3 @@ commander.command('*')
         commander.outputHelp();
         process.exit(consts.ERROR_EXIT);
     });
-
-
-function getRoot(dir=''){
-    return dir && path.resolve(dir) || process.cwd()
-}
-
-function getWorkspace(dir, config={}){
-    config.root = getRoot(dir);
-    return new Workspace(config);
-}

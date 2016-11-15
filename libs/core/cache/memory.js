@@ -2,7 +2,7 @@ import BaseCache from './base';
 
 export default class MemoryCache extends BaseCache{
     constructor() {
-        super()
+        super();
         this.store = {};
     }
 

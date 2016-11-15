@@ -2,7 +2,7 @@ import path from 'path';
 import co from 'co';
 import fs from 'mz/fs';
 import Router from 'koa-router';
-import send from 'koa-send';
+// import send from 'koa-send';
 import {BUNDLES_DIR} from '../../consts';
 import MemoryCache from '../cache/memory';
 
@@ -19,15 +19,6 @@ export default function devMiddleware(root){
     // dev.get('/', function *(next){
     //     yield send(this, 'index.html', {root: root});
     // });
-    dev.get('/main.js', function*(next){
-        let root = '_dev/modules/';
-        this.body = `
-            System.import('${root}sosgi.bootstrap').then(m =>{
-                console.log(m.sosgi.bootstrap.run({
-                    modules:[]
-                }));
-            })`;
-    });
     dev.get('/modules/:path+', function*(next){
         let path = this.params.path;
         console.log(`GET: /modules/${path}`);
@@ -61,16 +52,18 @@ class ModuleResolver{
                             let [name, ...parts] = id.split('/');
                             let rest = parts.join('/');
                             module = yield modules.getModule(name);
+                            console.log(name, module, rest);
                             if(rest){
                                 return module.joinPath(rest+'.js');
                             }
                             return yield module.getMainFilePath();
                         }
                     }catch(e){
+                        console.log('Error', e);
                     }
                     if(importer){
                         let root = path.dirname(importer);
-                        module = yield modules.findModule(root);
+                        module = modules.findModule(root);
                         if(module){
                             return path.resolve(root, id+'.js');
                         }
@@ -107,7 +100,7 @@ class Modules{
         return null;
     }
 
-    * findModule(path){
+    findModule(path){
         for(let module of this.modules.values()){
             if(path.includes(module.root)){
                 return module;

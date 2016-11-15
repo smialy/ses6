@@ -5,5 +5,6 @@ export function log(...args){
 
 
 export function error(...args){
+    args = args.map(arg => arg.stack ? arg.stack : arg.toStrin());
     process.stderr.write(args.join('\n')+'\n', 'utf8');
 }

@@ -15,18 +15,20 @@ export const error = () => function* errorMiddleware(next) {
 
 export const send = (root) => function* sendMiddleware(next){
     let ctx = this;
-
     let urlPath = this.path === '/' ? 'index.html' : this.path;
     let filePath = path.join(root, urlPath);
-    console.log(this.method, this.path, filePath);
-    try{
-        let stat = yield fs.stat(filePath);
-        this.set('Content-Length', stat.size);
-        this.type = mime.lookup(filePath);
-        this.body = fs.createReadStream(filePath);
-    }catch(e){
-        console.log('Not found')
-        console.log(e.message);
+    if(yield fs.exists(filePath)){
+        try{
+            let stat = yield fs.stat(filePath);
+            this.set('Content-Length', stat.size);
+            this.type = mime.lookup(filePath);
+            this.body = fs.createReadStream(filePath);
+        }catch(e){
+            console.log('Not found')
+            console.log(e.message);
+            yield next;
+        }
+    }else{
         yield next;
     }
 }

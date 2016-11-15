@@ -8,6 +8,9 @@ const endpoints = {
 };
 
 export default function getEndpoint(location, config){
+    if(!endpoints.hasOwnProperty(location.endpoint)){
+        throw new Error(`Not found endpoint: "${location.endpoint}"`)
+    }
     let factory = endpoints[location.endpoint];
     return factory(location, config);
 }
