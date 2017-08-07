@@ -19,19 +19,20 @@ export default function devMiddleware(root){
     // dev.get('/', function *(next){
     //     yield send(this, 'index.html', {root: root});
     // });
-    dev.get('/modules/:path+', function*(next){
-        let path = this.params.path;
+    dev.get('/modules/:path+', async function (ctx, next) {
+        let path = ctx.params.path;
         console.log(`GET: /modules/${path}`);
         try{
             let body = cache.get(path);
             if(!body){
-                body = yield rollupPlugin(resolver, path);
+                body = await rollupPlugin(resolver, path);
+                console.log(body)
                 cache.set(path, body);
             }
-            this.body = body;
+            ctx.body = body;
         }catch(e){
-            console.log('Module error', e)
-            yield next;
+            console.log('Module error', e);
+            await next();
         }
     });
     return dev;
@@ -93,7 +94,9 @@ class Modules{
     }
 
     * findModuleByName(name){
+        console.log('findModuleByName', name)
         let modulePath = path.resolve(path.join(this.root, name));
+        console.log(modulePath);
         if(yield fs.exists(modulePath)){
             return new Module(modulePath, name);
         }

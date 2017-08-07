@@ -9,6 +9,7 @@ import {parseLocation} from '../utils';
 
 export default function installPackage(workspace, locations){
     locations = prepareLocations(workspace, locations);
+    console.log(locations)
     return Promise.all(
         locations.map(location => install(location, workspace.config))
     );

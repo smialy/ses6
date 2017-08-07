@@ -3,39 +3,38 @@ import fs from 'mz/fs';
 import mime from 'mime-types';
 
 
-export const error = () => function* errorMiddleware(next) {
+export async function error(ctx, next) {
     try {
-        yield next;
+        await next();
     } catch (err) {
-        this.status = err.status || 500;
-        this.body = err.stack;
-        // this.app.emit('error', err, this);
+        ctx.status = err.status || 500;
+        ctx.body = err.stack;
+        // ctx.app.emit('error', err, ctx);
     }
 }
 
-export const send = (root) => function* sendMiddleware(next){
-    let ctx = this;
-    let urlPath = this.path === '/' ? 'index.html' : this.path;
+export const send = root => async function(ctx, next) {
+    let urlPath = ctx.path === '/' ? 'index.html' : ctx.path;
     let filePath = path.join(root, urlPath);
-    if(yield fs.exists(filePath)){
+    if(await fs.exists(filePath)){
         try{
-            let stat = yield fs.stat(filePath);
-            this.set('Content-Length', stat.size);
-            this.type = mime.lookup(filePath);
-            this.body = fs.createReadStream(filePath);
+            let stat = await fs.stat(filePath);
+            ctx.set('Content-Length', stat.size);
+            ctx.type = mime.lookup(filePath);
+            ctx.body = fs.createReadStream(filePath);
         }catch(e){
             console.log('Not found')
             console.log(e.message);
-            yield next;
+            await next();
         }
     }else{
-        yield next;
+        await next();
     }
 }
 
-export const responseTime = () => function* responseTime(next) {
+export async function responseTime(ctx, next) {
     let start = Date.now();
-    yield next;
+    await next();
     var delta = Math.ceil(Date.now() - start);
-    this.set('X-Response-Time', delta + 'ms');
+    ctx.set('X-Response-Time', delta + 'ms');
 }
