@@ -1,15 +1,26 @@
 import {rollup} from 'rollup';
+import html from 'rollup-plugin-html';
+import sass from 'rollup-plugin-sass';
 
 
-export default async function(resolver, name) {
+export default async function(root, resolver, name) {
     let bundleRollup = await rollup({
         entry: name,
         plugins: [
+            sass({
+                // output: false,
+                insert: true,
+                include: `${root}/**/*.scss`
+            }),
+            html({
+                include: `${root}/**/*.html`
+            }), 
             resolver.id()
         ]
     });
-    return await bundleRollup.generate({
-        moduleName: name,
-        format: 'iife'
-    }).code;
+    let result = await bundleRollup.generate({
+        moduleName: name.replace(/./g, '_'),
+        format: 'umd'
+    });
+    return result.code;
 }

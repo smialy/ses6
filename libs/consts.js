@@ -13,7 +13,7 @@ if (process.env.SOSGI_HOME){
 
 const NAME = 'sOSGi';
 export const SOSGI_DIR = '.sosgi';
-export const BUNDLES_DIR = 'node_modules';
+export const BUNDLES_DIR = 'packages';
 export const PACKAGE_FILE = 'package.json';
 
 

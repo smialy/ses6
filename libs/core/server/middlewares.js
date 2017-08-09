@@ -23,7 +23,6 @@ export const send = root => async function(ctx, next) {
             ctx.type = mime.lookup(filePath);
             ctx.body = fs.createReadStream(filePath);
         }catch(e){
-            console.log('Not found')
             console.log(e.message);
             await next();
         }

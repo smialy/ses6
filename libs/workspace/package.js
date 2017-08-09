@@ -9,12 +9,14 @@ export default class Package{
         this.root = root;
         this._data = {};
     }
-    load(){
+    async load(){
         let packageFile = path.join(this.root, PACKAGE_FILE);
-        return fs.readFile(packageFile)
-            .then(data => JSON.parse(data))
-            .then(data => this._data = data)
-            .then(() => true);
+        if(await fs.exists(packageFile)){
+            let data = await fs.readFile(packageFile);
+            this._data = JSON.parse(data);
+        }else{
+            console.warn(`Not found: ${PACKAGE_FILE}`);
+        }
     }
 
     get dependencies(){
@@ -22,13 +24,16 @@ export default class Package{
     }
     get locations(){
         let deps = this.dependencies;
-        let tpl = template`npm:${0}@${1}`;
-        return Object.keys(deps).map(name => tpl(name, cleanDep(deps[name])));
+        // let tpl = template`npm:${0}@${1}`;
+        return Object.keys(deps).map(name => `npm:${name}, ${cleanDep(deps[name])}`);
     }
     static create(root){
         let packageFile = path.join(PACKAGE_FILE);
     }
 }
+
+
+
 
 function cleanDep(dep){
     return dep.replace(/[^0-9.]/, '');

@@ -9,7 +9,6 @@ import MemoryCache from '../cache/memory';
 import rollupPlugin from './rollup';
 
 export default function devMiddleware(root){
-
     let modules = new Modules(root);
     let resolver = new ModuleResolver(modules);
     let cache = new MemoryCache();
@@ -19,15 +18,14 @@ export default function devMiddleware(root){
     // dev.get('/', function *(next){
     //     yield send(this, 'index.html', {root: root});
     // });
-    dev.get('/modules/:path+', async function (ctx, next) {
-        let path = ctx.params.path;
-        console.log(`GET: /modules/${path}`);
+    dev.get('/modules/:name+', async function (ctx, next) {
+        let name = ctx.params.name;
+        console.log(`GET: /modules/${name}`);
         try{
-            let body = cache.get(path);
+            let body = cache.get(name);
             if(!body){
-                body = await rollupPlugin(resolver, path);
-                console.log(body)
-                cache.set(path, body);
+                body = await rollupPlugin(root, resolver, name);
+                cache.set(name, body);
             }
             ctx.body = body;
         }catch(e){
@@ -45,31 +43,32 @@ class ModuleResolver{
     id(){
         let modules = this.modules;
         return {
-            resolveId: (id, importer) => {
-                return co(function*(){
-                    let module;
-                    try{
-                        if(!id.startsWith('.')){
-                            let [name, ...parts] = id.split('/');
-                            let rest = parts.join('/');
-                            module = yield modules.getModule(name);
-                            console.log(name, module, rest);
-                            if(rest){
-                                return module.joinPath(rest+'.js');
-                            }
-                            return yield module.getMainFilePath();
+            async resolveId(id, importer){
+                let module;
+                try{
+                    if(!id.startsWith('.')){
+                        let [name, ...parts] = id.split('/');
+                        let rest = parts.join('/');
+                        module = await modules.getModule(name);
+                        if(rest){
+                            return module.joinPath(rest+'.js');
                         }
-                    }catch(e){
-                        console.log('Error', e);
+                        return await module.getMainFilePath();
                     }
-                    if(importer){
-                        let root = path.dirname(importer);
-                        module = modules.findModule(root);
-                        if(module){
+                }catch(e){
+                    console.log('Error', e);
+                }
+                if(importer){
+                    let root = path.dirname(importer);
+                    module = modules.findModule(root);
+                    if(module){
+                        let ext = path.extname(id);
+                        if(!ext){
                             return path.resolve(root, id+'.js');
                         }
+                        
                     }
-                });
+                }
             }
         };
     }
@@ -81,9 +80,9 @@ class Modules{
         this.root = path.join(root, BUNDLES_DIR);
         this.modules = new Map();
     }
-    * getModule(name){
+    async getModule(name){
         if(!this.modules.has(name)){
-            let module = yield this.findModuleByName(name);
+            let module = await this.findModuleByName(name);
             if(module){
                 this.modules.set(name, module);
             }else{
@@ -93,11 +92,9 @@ class Modules{
         return this.modules.get(name);
     }
 
-    * findModuleByName(name){
-        console.log('findModuleByName', name)
+    async findModuleByName(name){
         let modulePath = path.resolve(path.join(this.root, name));
-        console.log(modulePath);
-        if(yield fs.exists(modulePath)){
+        if(await fs.exists(modulePath)){
             return new Module(modulePath, name);
         }
         return null;
@@ -119,21 +116,21 @@ class Module{
         this.name = name;
     }
 
-    * getMainFilePath(){
-        if(!(yield fs.exists(this.root))){
+    async getMainFilePath(){
+        if(!(await fs.exists(this.root))){
             this._throw('Not found module path: '+this.root);
         }
         let packagePath = path.join(this.root, 'package.json');
-        if(!(yield fs.exists(packagePath))){
+        if(!(await fs.exists(packagePath))){
             this._throw('Not found module package file: package.json');
         }
 
-        let data = JSON.parse(yield fs.readFile(packagePath, 'utf-8'));
+        let data = JSON.parse(await fs.readFile(packagePath, 'utf-8'));
         if(!data.hasOwnProperty('main')){
             this._throw('Not found "main" entry in package.json file');
         }
         let mainFilePath = path.join(this.root, data.main);
-        if(!(yield fs.exists(mainFilePath))){
+        if(!(await fs.exists(mainFilePath))){
             this._throw('Not found "main" entry: '+mainFilePath);
         }
         return mainFilePath;

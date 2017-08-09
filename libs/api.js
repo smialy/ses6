@@ -10,13 +10,15 @@ import install from './actions/install';
 
 
 let api = {
-    init: config => Workspace.create(getRoot(config.dir)),
-    server: config =>
-        getWorkspace(config).then(workspace =>
-            server(workspace)),
-    install: config =>
-        getWorkspace(config).then(workspace =>
-            install(workspace, config.locations || []))
+    init(config){
+        Workspace.create(getRoot(config.dir))
+    },
+    async server(config) { 
+        server(await getWorkspace(config))
+    },
+    async install(config){ 
+        install(await getWorkspace(config), config.locations || [])
+    }
 };
 export default api;
 
@@ -24,13 +26,9 @@ function getRoot(dir=''){
     return dir && path.resolve(dir) || process.cwd();
 }
 
-function getWorkspace(config={}, callback){
+async function getWorkspace(config={}, callback){
     config.root = getRoot(config.dir);
     let workspace = new Workspace(config);
-    return new Promise((resolve, reject) => {
-        workspace.load()
-            .then(() => {
-                resolve(workspace);
-            })
-    });
+    await workspace.load();
+    return workspace;
 }
