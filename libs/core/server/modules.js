@@ -22,12 +22,12 @@ export default function devMiddleware(root){
         let name = ctx.params.name;
         console.log(`GET: /modules/${name}`);
         try{
-            let body = cache.get(name);
-            if(!body){
-                body = await rollupPlugin(root, resolver, name);
-                cache.set(name, body);
-            }
-            ctx.body = body;
+            // let body = cache.get(name);
+            // if(!body){
+            ctx.body = await rollupPlugin(root, resolver, name);
+                // cache.set(name, body);
+            // }
+            // ctx.body = body;
         }catch(e){
             console.log('Module error', e);
             await next();
@@ -43,34 +43,39 @@ class ModuleResolver{
     id(){
         let modules = this.modules;
         return {
-            async resolveId(id, importer){
-                let module;
-                try{
-                    if(!id.startsWith('.')){
-                        let [name, ...parts] = id.split('/');
-                        let rest = parts.join('/');
-                        module = await modules.getModule(name);
-                        if(rest){
-                            return module.joinPath(rest+'.js');
-                        }
-                        return await module.getMainFilePath();
-                    }
-                }catch(e){
-                    console.log('Error', e);
-                }
-                if(importer){
-                    let root = path.dirname(importer);
-                    module = modules.findModule(root);
-                    if(module){
-                        let ext = path.extname(id);
-                        if(!ext){
-                            return path.resolve(root, id+'.js');
-                        }
-                        
-                    }
-                }
+            name: 'odss',
+            resolveId(id, importer){
+               return resolveId(modules, id, importer);
             }
         };
+    }
+}
+
+async function resolveId(modules, id, importer){
+    let module;
+    try{
+        if(!id.startsWith('.')){
+            let [name, ...parts] = id.split('/');
+            let rest = parts.join('/');
+            module = await modules.getModule(name);
+            if(rest){
+                return module.joinPath(rest+'.js');
+            }
+            return await module.getMainFilePath();
+        }
+    }catch(e){
+        console.log('Error', e);
+    }
+    if(importer){
+        let root = path.dirname(importer);
+        module = modules.findModule(root);
+        if(module){
+            let ext = path.extname(id);
+            if(!ext){
+                return path.resolve(root, id+'.js');
+            }
+            
+        }
     }
 }
 
