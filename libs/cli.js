@@ -40,17 +40,19 @@ commander.command('init [dir]')
 
 commander.command('server [dir]')
     .description('start development server')
-    .option('-h --host <host>', 'server host')
-    .option('-p --port <port>', 'server port')
+    .option('-h, --host <host>', 'server host', 'localhost')
+    .option('-p, --port <port>', 'server port', 8000)
+    .option('t, --ts', 'Enable TypeScript', false)
     .action((dir, options) => {
-        let port = options.port || 8000;
-        let host = options.host || 'localhost';
-
+        let port = options.port;
+        let host = options.host;
+        let ts = options.ts || false;
         ui.log(consts.PREFIX_MSG + `Start dev server: http://${host}:${port}/`);
         api.server({
             dir,
             host,
-            port
+            port,
+            ts
         });
     });
 

@@ -6,9 +6,10 @@ import * as middlewares from './middlewares';
 
 export default function server(workspace) {
     let config = workspace.config;
+    console.log(`Config:`, config);
     let root = config.root;
     let app = new Koa();
-    let dev = modulesRoute(root);
+    let dev = modulesRoute(config);
     app.use(dev.routes(), dev.allowedMethods());
 
     app.use(middlewares.error);
