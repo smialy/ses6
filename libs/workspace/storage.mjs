@@ -1,5 +1,4 @@
 import path from 'path';
-import co from 'co';
 import VFS from '../vfs';
 import {SOSGI_DIR} from '../consts';
 

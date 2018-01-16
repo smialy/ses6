@@ -1,5 +1,4 @@
 import fs from 'mz/fs';
-import co from 'co';
 import path from 'path';
 
 import * as ui from './ui';

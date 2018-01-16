@@ -1,10 +1,10 @@
 import path from 'path';
 import chalk from 'chalk';
 
+export const ROOT = path.dirname(path.dirname(import.meta.url.substr(7)))
 
-export const ROOT = path.dirname(__dirname);
 export const RESOURCES_ROOT = path.join(ROOT, 'libs', '_res');
-
+console.log(RESOURCES_ROOT)
 let SOSGI_ROOT_PATH = '';
 if (process.env.SOSGI_HOME){
     SOSGI_ROOT_PATH = process.env.SOSGI_HOME;

@@ -42,7 +42,7 @@ commander.command('server [dir]')
     .description('start development server')
     .option('-h, --host <host>', 'server host', 'localhost')
     .option('-p, --port <port>', 'server port', 8000)
-    .option('t, --ts', 'Enable TypeScript', false)
+    .option('--ts', 'Enable TypeScript', false)
     .action((dir, options) => {
         let port = options.port;
         let host = options.host;

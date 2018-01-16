@@ -1,5 +1,4 @@
 import path from 'path';
-import co from 'co';
 import fs from 'mz/fs';
 
 import {BUNDLES_DIR} from '../consts'
