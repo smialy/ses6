@@ -37,3 +37,8 @@ export async function responseTime(ctx, next) {
     var delta = Math.ceil(Date.now() - start);
     ctx.set('X-Response-Time', delta + 'ms');
 }
+
+export async function cors(ctx, next){
+    ctx.set('Access-Control-Allow-Origin', '*');
+    await next();
+}

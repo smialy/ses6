@@ -43,16 +43,22 @@ commander.command('server [dir]')
     .option('-h, --host <host>', 'server host', 'localhost')
     .option('-p, --port <port>', 'server port', 8000)
     .option('--ts', 'Enable TypeScript', false)
+    .option('-x, --proxy <url>', 'proxy url', false)
     .action((dir, options) => {
         let port = options.port;
         let host = options.host;
-        let ts = options.ts || false;
+        let ts = options.ts || false; 
+        let proxy = options.proxy;
         ui.log(consts.PREFIX_MSG + `Start dev server: http://${host}:${port}/`);
+        if(proxy){
+            ui.log(consts.PREFIX_MSG + `Start proxy to: ${proxy}`)
+        }
         api.server({
             dir,
             host,
             port,
-            ts
+            ts,
+            proxy
         });
     });
 

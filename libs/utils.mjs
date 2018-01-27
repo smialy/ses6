@@ -1,6 +1,5 @@
 import path from 'path';
 import crypto from 'crypto';
-
 import * as ui from './ui';
 import * as consts from './consts';
 
@@ -9,6 +8,7 @@ export function root(_path=''){
     let args = _path.split('/');
     return path.join(consts.ROOT, ...args);
 }
+
 function logError(error){
     if ("string" !== typeof error && error.stack) {
         error = error.stack;
