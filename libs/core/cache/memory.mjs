@@ -3,7 +3,7 @@ import BaseCache from './base';
 export default class MemoryCache extends BaseCache{
     constructor() {
         super();
-        this.store = new WeakMap();
+        this.store = new Map();
     }
 
     has(key) {

@@ -32,9 +32,6 @@ export default class Package{
     }
 }
 
-
-
-
 function cleanDep(dep){
     return dep.replace(/[^0-9.]/, '');
 }

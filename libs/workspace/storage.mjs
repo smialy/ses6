@@ -1,7 +1,5 @@
 import path from 'path';
 import VFS from '../vfs';
-import {SOSGI_DIR} from '../consts';
-
 
 class Bundles{
     constructor(vfs){
@@ -11,10 +9,10 @@ class Bundles{
 
 export default class Storage{
     constructor(root){
-        this.vfs = new VFS(path.join(root, SOSGI_DIR));
+        this.vfs = new VFS(root);
     }
     static create(root){
-        let vfs = new VFS(path.join(root, SOSGI_DIR));
+        let vfs = new VFS(root);
         return co(function*(){
             if(!(yield vfs.exists())){
                 yield vfs.mkdir()

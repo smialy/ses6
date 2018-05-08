@@ -1,21 +1,14 @@
 import path from 'path';
 import chalk from 'chalk';
 
+
+const NAME = 'sjs';
+
 export const ROOT = path.dirname(path.dirname(import.meta.url.substr(7)))
-
 export const RESOURCES_ROOT = path.join(ROOT, 'libs', '_res');
-console.log(RESOURCES_ROOT)
-let SOSGI_ROOT_PATH = '';
-if (process.env.SOSGI_HOME){
-    SOSGI_ROOT_PATH = process.env.SOSGI_HOME;
-}
 
-
-const NAME = 'sOSGi';
-export const SOSGI_DIR = '.sosgi';
 export const BUNDLES_DIR = 'packages';
 export const PACKAGE_FILE = 'package.json';
-
 
 export const PREFIX_MSG = chalk.green(`[${NAME}] `);
 export const PREFIX_MSG_ERR = chalk.red(`[${NAME}][ERROR] `);

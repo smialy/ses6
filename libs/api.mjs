@@ -9,24 +9,24 @@ import install from './actions/install';
 
 
 let api = {
-    init(config){
+    init(config) {
         Workspace.create(getRoot(config.dir))
     },
-    async server(config) { 
-        server(await getWorkspace(config))
+    async server(config) {
+
+        config.dirs = config.dirs.map(dir => path.resolve(dir));
+        config.dirs.push(process.cwd());
+
+        server(await getWorkspace(config));
     },
-    async install(config){ 
+    async install(config) {
         install(await getWorkspace(config), config.locations || [])
     }
 };
 export default api;
 
-function getRoot(dir=''){
-    return dir && path.resolve(dir) || process.cwd();
-}
-
-async function getWorkspace(config={}, callback){
-    config.root = getRoot(config.dir);
+async function getWorkspace(config = {}) {
+    config.root = process.cwd();
     let workspace = new Workspace(config);
     await workspace.load();
     return workspace;

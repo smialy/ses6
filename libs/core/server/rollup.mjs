@@ -1,5 +1,6 @@
 import Path from 'path';
 import Util from 'util';
+
 import MagicString from 'magic-string';
 import rollup from 'rollup';
 import rollupPlugins from 'rollup-pluginutils';
@@ -9,10 +10,10 @@ import babel from 'rollup-plugin-babel';
 import pluginClassProperties from 'babel-plugin-transform-class-properties';
 import pluginDecorators from 'babel-plugin-transform-decorators-legacy';
 import pluginAsync from 'babel-plugin-syntax-async-functions';
+import resolvePath from 'resolve';
+
 
 import * as fs from '../utils/files';
-
-import resolvePath from 'resolve';
 
 export default async function rollupLoader(config, name) {
     let plugins = [
@@ -26,12 +27,13 @@ export default async function rollupLoader(config, name) {
         }),
         sass({
             include: '/**/*.scss',
-            insert: true,
+            insert: false,
         }),
-        classApiPlugin({
-            include: '/**/*.js'
-        }),
+        // classApiPlugin({
+        //     include: '/**/*.js'
+        // }),
         babel({
+            babelrc: false,
             plugins: [
                 pluginAsync,
                 pluginClassProperties,
@@ -39,7 +41,7 @@ export default async function rollupLoader(config, name) {
             ]
         })
     ];
-    if(config.ts){
+    if(config.ts) {
         plugins.push(typescript({
             verbosity: 3,
         }));
@@ -48,9 +50,6 @@ export default async function rollupLoader(config, name) {
         input: name,
         plugins
     });
-    // console.log('exports', bundleRollup.exports);
-    // console.log('imports', bundleRollup.imports);
-    // console.log('modules', bundleRollup.modules);
 
     let result = await bundleRollup.generate({
         name: name.replace(/./g, '_'),
@@ -62,41 +61,70 @@ export default async function rollupLoader(config, name) {
     return result.code;
 }
 
-function nodeResolve(config={}){
-    let extensions = config.ts ? ['.ts', '.js'] : ['.js'];
+
+class Resolvers {
+    constructor(config){
+        this.config = config;
+        this._resolvers = new Set();
+    }
+    add(resolver){
+        this._resolvers.add(resolver);
+    }
+    resolve(importee, importer) {
+        for(const resolver of this._resolvers){
+            const path = resolver.resolve(this.config, importee, importer);
+            if(path){
+                return path;
+            }
+        }
+    }
+}
+
+function nodeResolve(config={}) {
+    let extensions = ['.mjs', '.js'];
     return {
         name: 'node-resolve',
-        resolveId( importee, importer ) {
+        async resolveId( importee, importer ) {
             if ( /\0/.test( importee ) ) return null;
+
             let parts = importee.split( /[\/\\]/ );
             let id = parts.shift();
             const isRelative = id === '.';
-            let basedir = config.root || process.cwd();
-            if (isRelative){
-                if(importer){
-                    basedir = Path.dirname(importer);
+            for(let basedir of config.dirs) {
+                if (isRelative) {
+                    if(importer) {
+                        basedir = Path.dirname(importer);
+                    }
+                }else {
+                    if(parts.length) {
+                        try{
+                            let path = resolvePath.sync(id, {
+                                basedir,
+                                packageFilter: packageFilter(config.ts),
+                                moduleDirectory: ['packages', 'node_modules'],
+                                extensions,
+                            });
+                            basedir = Path.dirname(path);
+                            importee = `./${Path.join(...parts)}`;
+                        }catch(e){
+                            continue;
+                        }
+                    }
                 }
-            }else {
-                if(parts.length){
-                    let path = resolvePath.sync(id, {
+                try{
+                    let path = resolvePath.sync(importee, {
                         basedir,
                         packageFilter: packageFilter(config.ts),
                         moduleDirectory: ['packages', 'node_modules'],
                         extensions,
                     });
-                    basedir = Path.dirname(path);
-                    importee = './'+Path.join(...parts);
+                    if(await fs.exists(path)) {
+                        return path;
+                    }
+                }catch(e){
+                    continue;
                 }
             }
-            let path = resolvePath.sync(importee, {
-                basedir,
-                packageFilter: packageFilter(config.ts),
-                moduleDirectory: ['packages', 'node_modules'],
-                extensions,
-            });
-
-            // console.log('path', path)
-            return path;
         }
     };
 }
@@ -167,45 +195,26 @@ async function findNamespace(path){
     }
     return 'default@0.0.0';
 }
+
 function cssPlugin(config={}){
 
     const filter = rollupPlugins.createFilter(
         config.include || [ '**/*.css' ],
         config.exclude || 'node_modules/**'
     );
-
+    let wasAdd = false;
     return {
         name: 'css',
-        intro () {
-            return insertCssLink;
-        },
-        async transform (code, id) {
+        transform (code, id) {
             if (!filter(id)) {
                 return null
             }
-            const path = id.substr(config.root.length, id.length);
-            code = `insertCssLink("${path}");`
+            wasAdd = true;
+            const css = JSON.stringify(code);
             return {
-                code: `export default ${code}`,
+                code: `export default ${css};`,
                 map: { mappings: '' }
             };
         }
     };
-}
-
-function insertCssLink(href) {
-    if (!href) {
-        return
-    }
-    if (typeof window === 'undefined') {
-        return
-    }
-    setTimeout(function(){
-        const link = document.createElement('link');
-        link.rel  = 'stylesheet';
-        link.type = 'text/css';
-        link.media = 'all';
-        link.href = href
-        document.head.appendChild(link);
-    });
 }

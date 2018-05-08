@@ -5,7 +5,8 @@ import * as ui from './ui';
 import * as consts from './consts';
 import pkg from '../package.json';
 import api from './api';
-import {setupExceptionHandler} from './utils';
+import { setupExceptionHandler } from './utils';
+
 
 export default function run(argv){
     setupExceptionHandler();
@@ -38,23 +39,23 @@ commander.command('init [dir]')
         });
     });
 
-commander.command('server [dir]')
+commander.command('server [dirs...]')
     .description('start development server')
     .option('-h, --host <host>', 'server host', 'localhost')
     .option('-p, --port <port>', 'server port', 8000)
     .option('--ts', 'Enable TypeScript', false)
     .option('-x, --proxy <url>', 'proxy url', false)
-    .action((dir, options) => {
+    .action((dirs, options) => {
         let port = options.port;
         let host = options.host;
-        let ts = options.ts || false; 
+        let ts = options.ts || false;
         let proxy = options.proxy;
         ui.log(consts.PREFIX_MSG + `Start dev server: http://${host}:${port}/`);
         if(proxy){
             ui.log(consts.PREFIX_MSG + `Start proxy to: ${proxy}`)
         }
         api.server({
-            dir,
+            dirs,
             host,
             port,
             ts,

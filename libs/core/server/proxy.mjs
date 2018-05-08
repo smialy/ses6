@@ -5,7 +5,7 @@ import buddy from 'co-body';
 
 export default (proxyUrl, options={}) => {
     const proxy = new url.URL(proxyUrl)
-    
+
     return (ctx, next) => {
         if(ctx.path.indexOf(proxy.pathname) !== 0){
             return next();

@@ -4,12 +4,15 @@
     runner.boot({
         bundles: [
             'odss.cdi',
-            'atto.core.io',
+            "odss.shell",
+            "odss.dev.ui.core",
+            "odss.dev.ui.terminal",
             'atto.core.main',
+            'atto.core.io',
             'atto.core.auth',
-            "atto.core.ui",
+            "atto.ui.core",
+            "atto.ui.main",
             // "atto.ui.login",
-            // "atto.ui.main"
         ],
         properties: {
             'http.url': ''

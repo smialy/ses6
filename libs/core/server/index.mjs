@@ -3,6 +3,7 @@ import {RESOURCES_ROOT} from '../../consts';
 import modulesRoute from './modules';
 import * as middlewares from './middlewares';
 import proxy from './proxy';
+import apiRoute from './api';
 
 
 export default function server(workspace) {
@@ -11,7 +12,9 @@ export default function server(workspace) {
     let root = config.root;
     let app = new Koa();
     let dev = modulesRoute(config);
+    let api = apiRoute();
     app.use(dev.routes(), dev.allowedMethods());
+    app.use(api.routes(), api.allowedMethods());
     app.use(middlewares.error);
     app.use(middlewares.responseTime);
     app.use(middlewares.send(RESOURCES_ROOT));
@@ -19,7 +22,6 @@ export default function server(workspace) {
     if(config.proxy){
         app.use(proxy(config.proxy));
     }
-
     app.listen(config.port, config.host);
 
 }
