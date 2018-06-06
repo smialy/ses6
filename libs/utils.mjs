@@ -29,7 +29,7 @@ export function sha1(name) {
 }
 
 
-export class Location{
+export class Location {
     constructor({endpoint, path, version}){
         this.endpoint = endpoint;
         this.path = path;
