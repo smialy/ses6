@@ -1,9 +1,6 @@
 import Path from 'path';
 import Util from 'util';
 
-import pluginClassProperties from 'babel-plugin-transform-class-properties';
-import pluginDecorators from 'babel-plugin-transform-decorators-legacy';
-import pluginAsync from 'babel-plugin-syntax-async-functions';
 import MagicString from 'magic-string';
 import rollup from 'rollup';
 import rollupPlugins from 'rollup-pluginutils';
@@ -35,10 +32,8 @@ export default async function rollupLoader(config, name) {
         babel({
             babelrc: false,
             plugins: [
-                pluginAsync,
-                pluginClassProperties,
-                pluginDecorators.default
-            ]
+                ["@babel/plugin-proposal-decorators", { legacy: true }],
+                ["@babel/plugin-proposal-class-properties", { loose: true }]            ]
         })
     ];
     if(config.ts) {

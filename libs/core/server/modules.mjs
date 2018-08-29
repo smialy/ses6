@@ -1,5 +1,4 @@
 import path from 'path';
-import fs from 'fs/promises';
 import Router from 'koa-router';
 import {
     BUNDLES_DIR
