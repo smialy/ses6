@@ -1,3 +1,3 @@
-export default function(){
-    console.log('from ./a')
+export default function () {
+  console.log('from ./a');
 }

@@ -6,7 +6,7 @@ export default class BaseCache{
     }
 
     makeKey(key){
-        return sha1(key);
+        return key;
     }
 
     has(key) {

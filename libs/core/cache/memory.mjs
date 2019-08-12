@@ -20,12 +20,10 @@ export default class MemoryCache extends BaseCache{
         }
     }
     set(key, value) {
-        console.log(`Cache::set(${key})`);
         this.store.set(this.makeKey(key), value);
     }
 
     remove(key) {
-        console.log(`Cache::remove(${key})`);
         delete this.store.delete(this.makeKey(key));
     }
 

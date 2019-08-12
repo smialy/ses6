@@ -25,7 +25,7 @@ export default class VFS{
     exists(path=''){
         return fs.stat(this.join(path)).then(() => true, ()=> false);
     }
-    unlink(path){
+    unlink(path){fs
         return fs.unlink(this.join(path));
     }
     mkdir(path='', mode=0o777){

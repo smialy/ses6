@@ -8,10 +8,11 @@ export function join(...parts){
 }
 
 export async function readJson(path){
-    const data = await read(path);
+    const data = await readFile(path);
     return JSON.parse(data);
 }
 
-export const read = Util.promisify(Fs.readFile);
+export const readFile = Util.promisify(Fs.readFile);
+export const readDir = Util.promisify(Fs.readdir);
 export const stat = Util.promisify(Fs.stat);
 export const exists = Util.promisify(Fs.exists);

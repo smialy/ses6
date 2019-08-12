@@ -38,7 +38,7 @@ export async function responseTime(ctx, next) {
     ctx.set('X-Response-Time', delta + 'ms');
 }
 
-export async function cors(ctx, next){
+export async function cors(ctx, next) {
     ctx.set('Access-Control-Allow-Origin', '*');
     await next();
 }

@@ -20,8 +20,6 @@ export default (proxyUrl, options={}) => {
         };
         return new Promise((resolve, reject) => {
             const req = http.request(options, res => {
-                // console.log(`STATUS: ${res.statusCode}`);
-                // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
                 res.setEncoding('utf8');
                 Object.keys(res.headers).forEach(
                     h => ctx.set(h, res.headers[h])
@@ -31,7 +29,6 @@ export default (proxyUrl, options={}) => {
                     body += chunk;
                 });
                 res.on('end', () => {
-                    // console.log(`BODY: ${body}`);
                     ctx.status = res.statusCode;
                     ctx.body = body;
                     resolve();

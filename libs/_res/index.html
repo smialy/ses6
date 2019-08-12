@@ -4,12 +4,15 @@
         <title>SAPPS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
-        <script src="system.js"></script>
-
         <script>
-            System.config({
-                baseURL: '_dev/modules'
-            });
+            window.System = {
+                resolve(id) {
+                    return Promise.resolve(`/_dev/modules/${id}`);
+                },
+                import(location) {
+                    return import(location);
+                }
+            }
         </script>
         <script type="module" src="/main.js"></script>
     </head>

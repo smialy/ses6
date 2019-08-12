@@ -1,13 +1,10 @@
-import path from 'path';
 import Router from 'koa-router';
-import {
-    BUNDLES_DIR
-} from '../../consts';
+import {sha1} from '../../utils';
 import MemoryCache from '../cache/memory';
-import rollupLoader from './rollup';
+import transform from '../builder/transform';
 
 
-export default function devMiddleware(config) {
+export default function devMiddleware(config, pkgs) {
     let cache = new MemoryCache();
     let dev = new Router({
         prefix: '/_dev'
@@ -15,14 +12,26 @@ export default function devMiddleware(config) {
     dev.get('/modules/:name+', async function(ctx, next) {
         let name = ctx.params.name;
         console.log(`GET: /modules/${name}`);
+        const pkg = pkgs.findByName(name);
+        if (!pkg) {
+            await next();
+            return;
+        }
+        const buildAt = pkg.buildAt.toString();
+        // ctx.set('ETag', sha1(buildAt));
+
+        ctx.set('Content-Type', 'text/javascript');
         try {
-            ctx.set('Content-Type', 'text/javascript');
-            let body = cache.get(name);
-            if (!body) {
-                body = await rollupLoader(config, name);
-                // cache.set(name, body);
+            let data = cache.get(name);
+            if (!data || data.buildAt !== buildAt) {
+                const body = await transform(config, name);
+                data = {
+                    body,
+                    buildAt,
+                };
+                cache.set(name, data);
             }
-            ctx.body = body;
+            ctx.body = data.body;
         } catch (e) {
             console.log('Module error', e);
             await next();

@@ -1,9 +1,8 @@
 import path from 'path';
-import fs from 'mz/fs';
 
-import {BUNDLES_DIR} from '../consts'
+import { BUNDLES_DIR } from '../consts'
 import getEndpoint from '../core/endpoints';
-import {parseLocation} from '../utils';
+import { parseLocation } from '../utils';
 
 
 export default function installPackage(workspace, locations){

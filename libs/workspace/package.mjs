@@ -4,7 +4,7 @@ import fs from 'mz/fs';
 import {PACKAGE_FILE} from '../consts';
 
 
-export default class Package{
+export default class Package {
     constructor(root){
         this.root = root;
         this._data = {};
