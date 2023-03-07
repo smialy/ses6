@@ -1,3 +1,3 @@
-import run from './cli';
+#!/usr/bin/env node
 
-run(process.argv);
+import './cli.mjs';

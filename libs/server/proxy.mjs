@@ -2,12 +2,11 @@ import http from 'http';
 import url from 'url';
 import buddy from 'co-body';
 
-
 export default (proxyUrl, options={}) => {
     const proxy = new url.URL(proxyUrl)
 
     return (ctx, next) => {
-        if(ctx.path.indexOf(proxy.pathname) !== 0){
+        if(ctx.path.indexOf(proxy.pathname) !== 0) {
             return next();
         }
         const options = {
@@ -18,6 +17,7 @@ export default (proxyUrl, options={}) => {
             method: ctx.method,
             headers: ctx.headers
         };
+        console.log(`Proxy: ${ctx.method.toUpperCase()} ${ctx.path} => ${proxyUrl}`);
         return new Promise((resolve, reject) => {
             const req = http.request(options, res => {
                 res.setEncoding('utf8');
@@ -38,7 +38,7 @@ export default (proxyUrl, options={}) => {
                 console.error(`problem with request: ${e.message}`);
                 reject(e);
             });
-            if(ctx.method === 'POST' || ctx.method === 'PUT'){
+            if(ctx.method === 'POST' || ctx.method === 'PUT') {
                 buddy.text(ctx).then(data => {
                     req.write(data);
                     req.end();

@@ -1,4 +1,4 @@
-import BaseCache from './base';
+import BaseCache from './base.mjs';
 
 export default class MemoryCache extends BaseCache{
     constructor() {
@@ -15,7 +15,7 @@ export default class MemoryCache extends BaseCache{
     }
 
     add(key, value) {
-        if(!has(key)){
+        if(!has(key)) {
             this.store.set(this.makeKey(key), value);
         }
     }

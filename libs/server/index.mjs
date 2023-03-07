@@ -1,0 +1,83 @@
+import http from 'http';
+
+import Koa from 'koa';
+import websocket from 'websocket';
+import { RESOURCES_ROOT, PREFIX_MSG } from '../consts.mjs'
+import * as ui from '../ui.mjs';
+import MemoryCache from '../core/cache/memory.mjs';
+import { WatcherService, FileChangeEvent } from '../utils/watcher.mjs';
+import packagesRoutes from './dev.mjs';
+import * as middlewares from './middlewares.mjs';
+import proxy from './proxy.mjs';
+
+
+
+export default async function server({ options, root, modules }) {
+
+    console.log(`Options:`, options);
+    const clients = new Set();
+    let sourceCache = new MemoryCache();
+
+    if (options.watch) {
+        const watcher = new WatcherService();
+        watcher.setRoots(modules.getSourcePaths());
+        watcher.listen(async ({ name, path }) => {
+            if (name === FileChangeEvent.UPDATED) {
+                const module = await modules.resolveByPath(path);
+                if (!module) {
+                    return;
+                }
+                sourceCache.remove(module.id);
+                console.log(`Update: ${path}`);
+                modules.runner.build(module).then(({ name }) => {
+                    if (clients.size) {
+                        const payload = JSON.stringify({cmd: 'update', name });
+                        console.log(payload);
+                        for(const connection of clients) {
+                            connection.send(payload);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    let app = new Koa();
+    let dev = packagesRoutes(modules, sourceCache, options);
+    app.use(dev.routes(), dev.allowedMethods());
+
+    app.use(middlewares.error);
+    app.use(middlewares.responseTime);
+    app.use(middlewares.send(root));
+    app.use(middlewares.send(RESOURCES_ROOT))
+    if(options.proxy) {
+        ui.log(PREFIX_MSG + `Start proxy to: ${options.proxy}`)
+        app.use(proxy(options.proxy));
+    }
+    const server = http.createServer(app.callback());
+
+    const wsServer = new websocket.server({
+        httpServer: server
+    });
+
+    wsServer.on('request', function(request) {
+        console.log('websocket::request()');
+        var connection = request.accept(null, request.origin);
+        clients.add(connection);
+        connection.on('message', function(message) {
+            console.log(`websocket::message(${message})`);
+          if (message.type === 'utf8') {
+
+          }
+        });
+        connection.on('close', function(connection) {
+            console.log(`websocket::close()`);
+            clients.delete(connection);
+        });
+    });
+
+    server.listen(options.port, options.host, () => {
+        let { address, port } = server.address();
+        console.log(`Start dev server http://${address}:${port}/`);
+    });
+}

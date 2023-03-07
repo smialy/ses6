@@ -1,13 +1,11 @@
 export class Events {
     constructor(_options = {}) {
+        this._listeners = new Set();
         this._options = _options;
     }
     get listen() {
         if (!this._listen) {
             this._listen = (listener, bind) => {
-                if (!this._listeners) {
-                    this._listeners = new Set();
-                }
                 if (this._listeners.size === 0 && this._options.onFirstListen) {
                     this._options.onFirstListen(this);
                 }
@@ -32,21 +30,19 @@ export class Events {
         return this._listen;
     }
     emit(event) {
-        if (this._listeners) {
-            const listeners = Array.from(this._listeners);
-            while (listeners.length) {
-                const { listener, bind } = listeners.shift();
-                try {
-                    listener.call(bind, event);
-                }
-                catch (e) {
-                    console.warn(e);
-                }
+        const listeners = Array.from(this._listeners);
+        while (listeners.length) {
+            const { listener, bind } = listeners.shift();
+            try {
+                listener.call(bind, event);
+            }
+            catch (e) {
+                console.warn(e);
             }
         }
     }
     dispose() {
         this._listen = undefined;
-        this._listeners = undefined;
+        this._listeners = new Set();
     }
 }

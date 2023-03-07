@@ -1,49 +1,36 @@
 {
-  "name": "senv",
+  "name": "sbundle",
   "version": "0.0.1",
-  "description": "senv",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "build2": "rollup -c",
-    "test": "make test",
-    "cover": "make cover",
-    "watch": "npm-watch"
-  },
-  "engine": 12,
-  "watch": {
-    "test": "{libs,tests}/*.js"
-  },
-  "bin": {
-    "senv": "bin/senv"
-  },
+  "description": "Bundle manager",
   "author": "smialy",
   "license": "MIT",
+  "bin": {
+    "sdev": "./libs/main.mjs"
+  },
   "dependencies": {
-    "chalk": "^2.4.2",
-    "commander": "^3.0.0",
-    "koa": "^2.7.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-router": "^7.4.0",
-    "koa-send": "^5.0.0",
-    "magic-string": "^0.25.3",
-    "mime-types": "^2.1.24",
-    "resolve": "^1.12.0",
-    "rimraf": "^2.6.3",
-    "rollup": "^1.19.4",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-commonjs": "^10.0.2",
-    "rollup-plugin-html": "^0.2.1",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-sass": "^1.2.2",
-    "websocket": "^1.0.29"
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-terser": "^0.4.0",
+    "chalk": "^5.2.0",
+    "chokidar": "^3.5.3",
+    "co-body": "^6.1.0",
+    "commander": "^10.0.0",
+    "deepmerge": "^4.3.0",
+    "koa": "^2.14.1",
+    "koa-router": "^12.0.0",
+    "mime-types": "^2.1.35",
+    "resolve": "^1.22.1",
+    "rmdir": "^1.2.0",
+    "rollup": "^3.18.0",
+    "websocket": "^1.0.34"
   },
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "lerna": "^3.16.4",
-    "nodemon": "^1.19.1",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "eslint": "^8.35.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "nodemon": "^2.0.21"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

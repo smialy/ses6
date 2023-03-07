@@ -1,11 +1,11 @@
 import chokidar from 'chokidar';
 
-import { Events } from '../utils/events';
+import { Events } from './events.mjs';
 
 export const FileChangeEvent = {
-	UPDATED: 'update',
-	ADDED: 'added',
-	REMOVED: 'removed',
+    UPDATED: 'update',
+    ADDED: 'added',
+    REMOVED: 'removed',
 };
 
 const IGNORED = [/\/node_modules\//, /\/.git\//, /\/.history\//];
@@ -24,9 +24,7 @@ export class WatcherService {
         if (this._watchers.has(path)) {
             console.warn(`Path: ${path} already has fs watcher`);
             this._watchers.get(path).close();
-
         }
-        // console.log(`Watch: ${path}`);
         const watcher = chokidar.watch(path, {
             ignored: IGNORED,
         });
@@ -47,7 +45,6 @@ export class WatcherService {
                 default:
                     return;
             }
-            // console.log(`Watcher::watch(${type}, ${path}`);
             if (name) {
                 this._events.emit({
                     name,

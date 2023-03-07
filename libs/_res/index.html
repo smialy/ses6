@@ -4,17 +4,7 @@
         <title>SAPPS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
-        <script>
-            window.System = {
-                resolve(id) {
-                    return Promise.resolve(`/_dev/modules/${id}`);
-                },
-                import(location) {
-                    return import(location);
-                }
-            }
-        </script>
-        <script type="module" src="/main.js"></script>
+        <script type="module" src="/boot.mjs"></script>
     </head>
     <body>
     </body>

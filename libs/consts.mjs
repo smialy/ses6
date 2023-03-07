@@ -7,6 +7,10 @@ const NAME = 'sjs';
 export const ROOT = path.dirname(path.dirname(import.meta.url.substr(7)))
 export const RESOURCES_ROOT = path.join(ROOT, 'libs', '_res');
 
+export const INTERNAL_MODULES = [
+    `@odss/core`,
+];
+
 export const BUNDLES_DIR = 'packages';
 export const PACKAGE_FILE = 'package.json';
 
@@ -17,6 +21,3 @@ export const PREFIX_MSG_SUCCESS = chalk.cyan(`[${NAME}] `);
 
 export const ERROR_EXIT = 1;
 export const SUCCESS_EXIT = 0;
-
-export const SYSTEMJS_GIT = 'https://github.com/systemjs/systemjs.git';
-export const SYSTEMJS_LOADER_GIT = 'https://github.com/ModuleLoader/es6-module-loader.git';

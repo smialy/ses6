@@ -1,12 +1,14 @@
+import fs from 'fs';
 import path from 'path';
-import fs from 'mz/fs';
 import mime from 'mime-types';
 
+import { stat, exists } from '../utils/files.mjs';
 
 export async function error(ctx, next) {
     try {
         await next();
     } catch (err) {
+        console.log({ err })
         ctx.status = err.status || 500;
         ctx.body = err.stack;
         // ctx.app.emit('error', err, ctx);
@@ -16,13 +18,14 @@ export async function error(ctx, next) {
 export const send = root => async function(ctx, next) {
     let urlPath = ctx.path === '/' ? 'index.html' : ctx.path;
     let filePath = path.join(root, urlPath);
-    if(await fs.exists(filePath)){
+    if(await exists(filePath)) {
         try{
-            let stat = await fs.stat(filePath);
-            ctx.set('Content-Length', stat.size);
+            let info = await stat(filePath);
+            ctx.set('Access-Control-Allow-Origin', '*');
+            ctx.set('Content-Length', info.size);
             ctx.type = mime.lookup(filePath);
             ctx.body = fs.createReadStream(filePath);
-        }catch(e){
+        }catch(e) {
             console.log(e.message);
             await next();
         }

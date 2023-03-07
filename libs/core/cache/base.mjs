@@ -1,11 +1,11 @@
-import {sha1} from '../../utils';
+import { sha1 } from '../../utils/hash.mjs';
 
 export default class BaseCache{
-    constructor(){
+    constructor() {
 
     }
 
-    makeKey(key){
+    makeKey(key) {
         return key;
     }
 
@@ -21,7 +21,7 @@ export default class BaseCache{
         throw new TypeError('Not implemented. BaseCache::add(key)');
     }
 
-    set(key, value){
+    set(key, value) {
         throw new TypeError('Not implemented. BaseCache::set(key, value)');
     }
 
