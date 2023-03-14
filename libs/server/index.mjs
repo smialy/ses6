@@ -22,11 +22,20 @@ export default async function server({ options, root, modules }) {
         const watcher = new WatcherService();
         watcher.setRoots(modules.getSourcePaths());
 
-        const build = async module => {
-            if (module.canBuild()) {
+        const build = async related => {
+            const ids = related.map(m => m.id);
+            for(const module of related) {
+                if (!module.canBuild()) {
+                    continue
+                }
                 const { skip, name } = await modules.runner.build(module);
-                if (!skip && clients.size) {
-                    sourceCache.remove(module.id);
+                if (skip) {
+                    continue;
+                }
+                for(const id of ids) {
+                    sourceCache.remove(id);
+                }
+                if (!clients.size) {
                     const payload = JSON.stringify({cmd: 'update', name });
                     for(const connection of clients) {
                         connection.send(payload);
@@ -41,21 +50,19 @@ export default async function server({ options, root, modules }) {
                     return;
                 }
                 console.log(`Update: ${path}`);
-                for(const module of relatedModules) {
-                    build(module);
-                }
+                build(relatedModules);
             }
         });
     }
 
     let app = new Koa();
     let dev = packagesRoutes(modules, sourceCache, options);
-    app.use(dev.routes(), dev.allowedMethods());
 
     app.use(middlewares.error);
     app.use(middlewares.responseTime);
     app.use(middlewares.send(root));
     app.use(middlewares.send(RESOURCES_ROOT))
+    app.use(dev.routes(), dev.allowedMethods());
     if(options.proxy) {
         ui.log(PREFIX_MSG + `Start proxy to: ${options.proxy}`)
         app.use(proxy(options.proxy));

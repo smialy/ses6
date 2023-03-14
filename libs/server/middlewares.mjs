@@ -36,9 +36,13 @@ export const send = root => async function(ctx, next) {
 
 export async function responseTime(ctx, next) {
     let start = Date.now();
-    await next();
-    var delta = Math.ceil(Date.now() - start);
-    ctx.set('X-Response-Time', delta + 'ms');
+    try {
+        await next();
+    } finally {
+        var dur = Math.ceil(Date.now() - start);
+        ctx.set('Server-Timing', `total;dur=${dur}`);
+    }
+
 }
 
 export async function cors(ctx, next) {

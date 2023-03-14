@@ -107,9 +107,7 @@ export class Modules {
         }
     }
     *resolveByPath(path) {
-        console.log({ path });
         for(const module of this._modules.values()) {
-            console.log('module.root', module.root);
             if (path.startsWith(module.root)) {
                 yield module;
             }
