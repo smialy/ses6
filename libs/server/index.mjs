@@ -26,6 +26,7 @@ export default async function server({ options, root, modules }) {
             if (module.canBuild()) {
                 const { skip, name } = await modules.runner.build(module);
                 if (!skip && clients.size) {
+                    sourceCache.remove(module.id);
                     const payload = JSON.stringify({cmd: 'update', name });
                     for(const connection of clients) {
                         connection.send(payload);
@@ -41,7 +42,6 @@ export default async function server({ options, root, modules }) {
                 }
                 console.log(`Update: ${path}`);
                 for(const module of relatedModules) {
-                    sourceCache.remove(module.id);
                     build(module);
                 }
             }
