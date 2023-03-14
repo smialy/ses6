@@ -18,7 +18,10 @@ async function* walkPackages(dirs) {
 }
 
 function findExportFile(pkg, browser) {
-    const names = browser ? ['browser'] : ['browser', 'module', 'import', 'main', 'default'];
+    const names = ['module', 'import', 'main', 'default'];
+    if (browser) {
+        names.unshift('browser')
+    }
     if (typeof pkg === 'string') {
         return pkg;
     }
@@ -103,10 +106,12 @@ export class Modules {
             }
         }
     }
-    resolveByPath(path) {
+    *resolveByPath(path) {
+        console.log({ path });
         for(const module of this._modules.values()) {
-            if (path.startsWith(module.root) && module.canBuild()) {
-                return module;
+            console.log('module.root', module.root);
+            if (path.startsWith(module.root)) {
+                yield module;
             }
         }
     }

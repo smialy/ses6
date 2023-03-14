@@ -10,7 +10,6 @@ export function createModulesResolver(modules) {
         async resolveId( id, importer, options ) {
             if ( /\0/.test( id ) ) return null;
 
-            // console.log({ id, importer })
             // const resolution = await this.resolve(id, importer, { skipSelf: true, ...options });
             if (isRelative(id) && importer) {
                 return null;
@@ -33,7 +32,6 @@ export function createModulesResolver(modules) {
                 };
             }
             if (module) {
-                // console.log(module.getMainFile());
                 return module.getMainFile();
             }
         },
@@ -41,14 +39,16 @@ export function createModulesResolver(modules) {
             try {
                 await statFile(id);
             } catch (e) {
-                console.warn(`Problem with load: ${id}. Try to build it`);
+                console.warn(`Problem with load: ${id}. I will try to build it`);
                 try {
-                    const module = await modules.findById(id);
+                    const module = modules.findById(id) || modules.findByPath(id);
                     if (module) {
-                        await module.runner.build(module);
+                        await modules.runner.build(module);
+                    } else {
+                        console.warn(`Not found module for ${id}`);
                     }
-                }catch(e) {
-                    console.log(e);
+                }catch(err) {
+                    console.log({ err });
                 }
             }
         }

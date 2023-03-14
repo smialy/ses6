@@ -21,7 +21,6 @@ export default function packagesRoute(modules, cache, options) {
         const module = await modules.findById(id);
         if (module) {
             if(!data) {
-                console.log('compile', { id });
                 const format = 'esm';
                 const transformConfig = {
                     format,

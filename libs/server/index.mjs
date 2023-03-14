@@ -21,23 +21,29 @@ export default async function server({ options, root, modules }) {
     if (options.watch) {
         const watcher = new WatcherService();
         watcher.setRoots(modules.getSourcePaths());
+
+        const build = async module => {
+            if (module.canBuild()) {
+                const { skip, name } = await modules.runner.build(module);
+                if (!skip && clients.size) {
+                    const payload = JSON.stringify({cmd: 'update', name });
+                    for(const connection of clients) {
+                        connection.send(payload);
+                    }
+                }
+            }
+        };
         watcher.listen(async ({ name, path }) => {
             if (name === FileChangeEvent.UPDATED) {
-                const module = await modules.resolveByPath(path);
-                if (!module) {
+                const relatedModules = [...modules.resolveByPath(path)];
+                if (!relatedModules.length) {
                     return;
                 }
-                sourceCache.remove(module.id);
                 console.log(`Update: ${path}`);
-                modules.runner.build(module).then(({ name }) => {
-                    if (clients.size) {
-                        const payload = JSON.stringify({cmd: 'update', name });
-                        console.log(payload);
-                        for(const connection of clients) {
-                            connection.send(payload);
-                        }
-                    }
-                });
+                for(const module of relatedModules) {
+                    sourceCache.remove(module.id);
+                    build(module);
+                }
             }
         });
     }
