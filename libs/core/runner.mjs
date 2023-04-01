@@ -26,7 +26,8 @@ export class Runner {
                 }
             }
             if (!added) {
-                console.log(`Missing build script: "${cmds}" for ${name}`)
+                console.log(`Missing build script: "${cmds}" for ${name}`);
+                resolve({ skip: false, missing: true, name });
             }
         });
     }
@@ -39,7 +40,8 @@ export class Runner {
             const { root, name, cmd, resolve } = this.tasks.shift();
             try {
                 console.log(`Build: ${name} (${cmd})`);
-                await runCommand(root, `npm run ${cmd}`);
+                const result = await runCommand(root, `npm run ${cmd}`);
+                console.log(result);
                 console.log(`Build: ${name} finished`);
             } finally {
                 resolve({ root, name });
@@ -47,7 +49,6 @@ export class Runner {
                 this.next();
             }
         }
-
     }
 }
 
@@ -62,6 +63,7 @@ async function runCommand(baseDir, command) {
     if (stderr) {
         return stderr;
     }
+
     return stdout
 
 }

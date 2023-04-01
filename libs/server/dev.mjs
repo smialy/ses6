@@ -9,7 +9,7 @@ export default function packagesRoute(modules, cache, options) {
     dev.get('/config.json', (ctx, next) => {
         ctx.set('Content-Type', 'application/json');
         ctx.body = JSON.stringify({
-            resolverPrefix: `${prefix}/package/`,
+            resolverPrefix: `/`,
             properties: { ...options.properties },
             bundles: [ ...options.bundles ],
         });
@@ -24,7 +24,7 @@ export default function packagesRoute(modules, cache, options) {
                 const format = 'esm';
                 const transformConfig = {
                     format,
-                    path: '/-/package/'
+                    path: '/'
                 };
                 const transform = transformer(modules, transformConfig);
                 const { code } = await transform(id);

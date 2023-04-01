@@ -22,12 +22,13 @@ export class WatcherService {
     }
     _watch(path) {
         if (this._watchers.has(path)) {
-            console.warn(`Path: ${path} already has fs watcher`);
             this._watchers.get(path).close();
         }
         const watcher = chokidar.watch(path, {
             ignored: IGNORED,
+            ignoreInitial: true,
         });
+        this._watchers.set(path, watcher);
         watcher.on('all', (type, path) => {
             let name = '';
             switch (type) {
@@ -53,7 +54,6 @@ export class WatcherService {
             }
         });
 
-        this._watchers.set(path, watcher);
     }
     listen(callback) {
         if(!this._events) {

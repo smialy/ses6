@@ -34,8 +34,9 @@ export default async function server({ options, root, modules }) {
                 }
                 for(const id of ids) {
                     sourceCache.remove(id);
+                    console.log('clear cache', id);
                 }
-                if (!clients.size) {
+                if (clients.size) {
                     const payload = JSON.stringify({cmd: 'update', name });
                     for(const connection of clients) {
                         connection.send(payload);

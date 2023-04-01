@@ -1,4 +1,4 @@
-import { boot } from '/-/package/@odss/core';
+import { boot } from '@odss/core';
 (async function() {
     const res = await fetch('/-/config.json');
     const { resolverPrefix, properties, bundles } = await res.json();

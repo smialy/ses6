@@ -25,10 +25,10 @@ export const stat = Util.promisify(Fs.stat);
 export const exists = Util.promisify(Fs.exists);
 
 const walkOptions = {
-    deepFilter(entry) {
+    deepFilter() {
         return true;
     },
-    entryFilter(entry) {
+    entryFilter() {
         return true;
     }
 };

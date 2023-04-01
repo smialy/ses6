@@ -27,7 +27,11 @@ function findExportFile(pkg, browser) {
     }
     for(const name of names) {
         if (pkg[name]) {
-            return pkg[name];
+            const file = pkg[name];
+            if (typeof file !== 'string') {
+                return findExportFile(file, browser);
+            }
+            return file;
         }
     }
     return null;
@@ -176,10 +180,6 @@ export class Module {
     async resolve(id) {
         return resolver(this.root, id);
     }
-
-    isValid() {
-        return false;
-    }
     canBuild() {
         return false;
     }
@@ -197,7 +197,7 @@ export class MainModule extends Module {
         if (this.pkg.source) {
             return [Path.dirname(Path.resolve(this.root, this.pkg.source))];
         }
-        return [this.root];
+        return [Path.resolve(this.root, this.file)];
     }
     canBuild() {
         return true;
