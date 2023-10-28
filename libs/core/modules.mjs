@@ -188,6 +188,7 @@ export class Module {
         return [];
     }
 }
+
 export class MainModule extends Module {
     constructor(id, root, file, pkg) {
         super(id, root, file)

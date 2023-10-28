@@ -1,28 +1,23 @@
-import Fs from 'fs';
 import Path from 'path';
-import Util from 'util';
-import rmdir_ from 'rmdir';
-import { opendir, readFile } from 'node:fs/promises';
-
+import { opendir, readFile, access, constants } from 'node:fs/promises';
 
 export function join(...parts) {
     return parts.join(Path.sep);
+}
+
+export const exists = async (path) => {
+    try {
+        await access(path, constants.R_OK);
+        return true;
+    } catch(err) {
+    }
+    return false;
 }
 
 export async function readJsonFile(filePath) {
     const content = await readFile(filePath, 'utf8',);
     return JSON.parse(content);
 }
-
-export const writeFile = Util.promisify(Fs.writeFile);
-export const copyFile = Util.promisify(Fs.copyFile);
-export const unlink = Fs.unlink;
-
-export const readdir = Util.promisify(Fs.readdir);
-export const mkdir = Util.promisify(Fs.mkdir);
-export const rmdir = Util.promisify(rmdir_);
-export const stat = Util.promisify(Fs.stat);
-export const exists = Util.promisify(Fs.exists);
 
 const walkOptions = {
     deepFilter() {

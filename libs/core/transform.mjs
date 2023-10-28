@@ -39,9 +39,6 @@ export default function rollupTransformer(modules, options) {
                     keep_fnames: true,
                     ecma: modern ? 2017 : 5,
                 }) : null,
-                // classApiPlugin({
-                //     include: '/**/*.js'
-                // }),
             ].filter(Boolean)
         });
         let { output } = await bundleRollup.generate({

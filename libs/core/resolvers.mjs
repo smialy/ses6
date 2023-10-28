@@ -10,6 +10,7 @@ export function createModulesResolver(modules) {
         async resolveId( id, importer, options ) {
             if ( /\0/.test( id ) ) return null;
 
+            console.log({ id, importer })
             // const resolution = await this.resolve(id, importer, { skipSelf: true, ...options });
             if (isRelative(id) && importer) {
                 return null;

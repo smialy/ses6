@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import mime from 'mime-types';
 
-import { stat, exists } from '../utils/files.mjs';
+import { stat } from 'node:fs/promises';
+import { exists } from '../utils/files.mjs';
 
 export async function error(ctx, next) {
     try {

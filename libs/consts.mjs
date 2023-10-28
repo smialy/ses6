@@ -1,11 +1,11 @@
 import path from 'path';
 import chalk from 'chalk';
 
-
 const NAME = 'sjs';
 
-export const ROOT = path.dirname(path.dirname(import.meta.url.substr(7)))
+export const ROOT = path.dirname(path.dirname(import.meta.url.substring(7)))
 export const RESOURCES_ROOT = path.join(ROOT, 'libs', '_res');
+export const STORAGE_ROOT = path.join(process.cwd(), '.storage');
 
 export const INTERNAL_MODULES = [
     `@odss/core`,
