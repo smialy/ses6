@@ -1,0 +1,17 @@
+{
+    "port":8001,
+    "watch": true,
+    "dirs": [
+        "../stool-js/",
+        "../odss-js/"
+    ],
+    "proxy": "http://localhost:8080/api",
+    "properties": {
+        "http.url": "http://localhost:8000"
+    },
+    "bundles": [
+        "@odss/shell.core",
+        "@odss/terminal",
+        "@odss/config"
+    ]
+}

@@ -37,6 +37,7 @@ export default async function server({ options, root, modules }) {
             }
         };
         watcher.listen(async ({ name, path }) => {
+            console.log({ name, path })
             if (name === FileChangeEvent.UPDATED) {
                 const relatedModules = [...modules.resolveByPath(path)];
                 if (!relatedModules.length) {

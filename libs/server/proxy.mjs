@@ -9,15 +9,16 @@ export default (proxyUrl, options={}) => {
         if(ctx.path.indexOf(proxy.pathname) !== 0) {
             return next();
         }
+        const path = ctx.path + (ctx.querystring ? `?${ctx.querystring}` : '');
         const options = {
+            path,
             protocol: proxy.protocol,
             hostname: proxy.hostname,
             port: proxy.port,
-            path: ctx.path,
             method: ctx.method,
             headers: ctx.headers
         };
-        console.log(`Proxy: ${ctx.method.toUpperCase()} ${ctx.path} => ${proxyUrl}`);
+        console.log(`Proxy: ${ctx.method.toUpperCase()} ${path} => ${proxyUrl}`);
         return new Promise((resolve, reject) => {
             const req = http.request(options, res => {
                 res.setEncoding('utf8');
